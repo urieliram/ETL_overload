@@ -62,26 +62,15 @@ for i in dfdir.index:
             index_col = False
             )     
     
-    # df[['Demanda']] = df[['Demanda']].astype(float)
-    # df[['GenTot']] = df[['GenTot']].astype(float)
-    # df[['Area']] = df[['Area']].astype(str)
-    
-    #aux1 = df[(df[' GenTot']>1) & (df[' GenTot']>1) & (df[' Demanda']>1)]
     areas = ['CEN         ','ORI         ','OCC         ','NOR         ','NTE         ','NES         ','PEN         ','GUA         ','WE2         ','PEE         ','BEL         ']
     
     for j in range(len(areas)):
         aux = df[df['Area'] == areas[j]]
-        aux['neta'] = pd.DataFrame( df['Demanda'] - df['GenTot'])
-        #print(aux['neta'].max())
-        #print(aux['neta'].min())
-        
-        #print(str(column_areas[j]))
-        #print(i)
+        aux['neta'] = pd.DataFrame( df['Demanda'] - df['GenTot'])        
         cad = str(column_areas[j])
         cad_min = cad +'_min'
         dfout.loc[i,cad] = aux['neta'].max()
         dfout.loc[i,cad_min] = aux['neta'].min()
         #time.sleep(1)
  
-    #df.to_csv('df.csv')
-    dfout.to_csv('dfout.csv')
+    dfout.to_csv('overload.csv')
