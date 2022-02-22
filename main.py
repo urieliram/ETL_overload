@@ -12,12 +12,12 @@ dfram = pd.read_csv('GRUPOSRAMAS.csv', header = None)
 dfare = pd.read_csv('AREAMEM.csv',     header = None)
 n = len(dfdir.index)
 
-#Agregar columnas que representan líneas
+#Agregamos columnas que representan líneas
 column_lines = []
 for i in dfram.index:
     column_lines.append(i+1)
     
-#Agregar columnas que representan líneas
+#Agregar columnas que representan las demanda neta en areas
 column_areas = []
 for i in dfare.index:
     column_areas.append(str(dfare[0][i]))
@@ -48,11 +48,40 @@ for i in dfdir.index:
     dfout.loc[i,'Num'] = int(dfdir[0][i])
     
     for j in df.index:
-        #nlinea = int(df[0][j])
-        #print(df[1][j])
-        #print(dfram.index[dfram[1] == str(df[1][j].strip())].tolist())
         aux = dfram.index[dfram[1] == str(df[1][j].strip())]
         dfout.loc[i,aux+1] = 1
-        #time.sleep(3)        
     
-dfout.to_csv('dfout.csv')
+
+file = 'r_Areas.csv'
+for i in dfdir.index:
+    dir = str(dfdir[1][i])
+    dir = dir + '/'
+    df  = pd.read_csv(raiz + dir + file,
+            skiprows=1, # salta la primera línea
+            names = ['Inter' , 'Area', 'GenTer', 'GenHid', 'GenRE', 'GenNP', 'GenTot', 'Demanda', 'Corte', 'Excedente', 'PotInt', 'Perdidas'], # nombres de índice manuales
+            index_col = False
+            )     
+    
+    # df[['Demanda']] = df[['Demanda']].astype(float)
+    # df[['GenTot']] = df[['GenTot']].astype(float)
+    # df[['Area']] = df[['Area']].astype(str)
+    
+    #aux1 = df[(df[' GenTot']>1) & (df[' GenTot']>1) & (df[' Demanda']>1)]
+    areas = ['CEN         ','ORI         ','OCC         ','NOR         ','NTE         ','NES         ','PEN         ','GUA         ','WE2         ','PEE         ','BEL         ']
+    
+    for j in range(len(areas)):
+        aux = df[df['Area'] == areas[j]]
+        aux['neta'] = pd.DataFrame( df['Demanda'] - df['GenTot'])
+        #print(aux['neta'].max())
+        #print(aux['neta'].min())
+        
+        #print(str(column_areas[j]))
+        #print(i)
+        cad = str(column_areas[j])
+        cad_min = cad +'_min'
+        dfout.loc[i,cad] = aux['neta'].max()
+        dfout.loc[i,cad_min] = aux['neta'].min()
+        #time.sleep(1)
+ 
+    #df.to_csv('df.csv')
+    dfout.to_csv('dfout.csv')
